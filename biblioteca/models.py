@@ -1,7 +1,6 @@
 from django.db import models
 import datetime
-from django.forms import ValidationError
-from rut_chile import rut_chile
+from django.core.exceptions import ValidationError
 
 ahora = datetime.datetime.now
 
@@ -9,8 +8,29 @@ ahora = datetime.datetime.now
 
 
 def validar_rut(rut):
-    valido = rut_chile.is_valid_rut(rut)
-    if valido == False:
+    if not rut:
+        raise ValidationError('RUT inválido.')
+    r = str(rut).upper().replace('.', '').replace('-', '').strip()
+    if len(r) < 2:
+        raise ValidationError('RUT inválido.')
+    numero, dv = r[:-1], r[-1]
+    if not numero.isdigit():
+        raise ValidationError('RUT inválido.')
+    total = 0
+    factor = 2
+    for n in reversed(numero):
+        total += int(n) * factor
+        factor += 1
+        if factor > 7:
+            factor = 2
+    resto = 11 - (total % 11)
+    if resto == 11:
+        esperado = '0'
+    elif resto == 10:
+        esperado = 'K'
+    else:
+        esperado = str(resto)
+    if dv != esperado:
         raise ValidationError('RUT inválido.')
 
 
@@ -38,6 +58,12 @@ class Autor(models.Model):
     biografia = models.TextField(blank=True)
     created_at = models.DateTimeField(default=ahora)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        if self.pseudonimo!='':
+            return self.pseudonimo
+        else:
+            return self.nombre
 
 
 class Comuna(models.Model):
@@ -99,6 +125,9 @@ class Categoria(models.Model):
     habilitado = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=ahora)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self): 
+        return self.categoria 
 
 
 class Libro(models.Model):

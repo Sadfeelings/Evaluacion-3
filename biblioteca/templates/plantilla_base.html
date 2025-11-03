@@ -47,16 +47,16 @@
           <div class="collapse navbar-collapse" id="navbarColor02">
             <ul class="navbar-nav me-auto">
               <li class="nav-item">
-                <a class="nav-link active" href="#"
+                <a class="nav-link active" href="{%url 'pagina_inicio'%}"
                   >Inicio
                   <span class="visually-hidden">(current)</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Autores</a>
+                <a class="nav-link" href="{%url 'listado_autores'%}">Autores</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Libros</a>
+                <a class="nav-link" href="{%url 'listado_libros'%}">Libros</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{%url 'listado_lectores'%}"
@@ -93,7 +93,7 @@
 
     <hr />
     <footer>
-      <p>&copy; 2025 Erick Bailey</p>
+      <p>&copy; 2025 Sadfeelings</p>
     </footer>
     {% block scripts %}{% endblock %}
   </body>

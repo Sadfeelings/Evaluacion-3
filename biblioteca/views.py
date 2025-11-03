@@ -4,6 +4,7 @@ from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
+import django_filters
 
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication
@@ -40,6 +41,14 @@ def registro(request):
 @login_required
 def pagina_inicio(request):
     return render(request, 'biblioteca/inicio.html')
+
+class LibroFilter(django_filters.FilterSet): 
+    id_categoria = django_filters.ModelChoiceFilter(queryset=Categoria.objects.all(), label='Categoría')
+    id_autor = django_filters.ModelChoiceFilter(queryset=Autor.objects.all(),
+                                                 label='Autor') 
+    class Meta: 
+        model = Libro
+        fields = ['id_categoria','id_autor'] 
 
 
 class NacionalidadViewSet(viewsets.ModelViewSet):
@@ -113,8 +122,10 @@ class CategoriaViewSet(viewsets.ModelViewSet):
 
 
 def listado_libros(request):
-    libros = Libro.objects.all()
-    return render(request, 'biblioteca/lista_libros.html', {'libros': libros})
+    f = LibroFilter(request.GET, queryset=Libro.objects.all())
+    return  render(request, 'biblioteca/lista_libros.html',
+                    {'filter': f})
+
 
 
 class LibroViewSet(viewsets.ModelViewSet):
