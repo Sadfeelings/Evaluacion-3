@@ -4,15 +4,17 @@ from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
-import django_filters
 
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django_filters import rest_framework as django_filters
 
 from .serializer import NacionalidadSerializer, AutorSerializer, ComunaSerializer, DireccionSerializer, BibliotecaSerializer, LectorSerializer, TipoCategoriaSerializer, CategoriaSerializer, LibroSerializer, PrestamoSerializer, TipoParametroSerializer, ParametroSerializer
 from .models import Nacionalidad, Autor, Comuna, Direccion, Biblioteca, Lector, TipoCategoria, Categoria, Libro, Prestamo, TipoParametro, Parametro
 # Create your views here.
+
+
 
 
 def logout_view(request):
@@ -37,18 +39,29 @@ def registro(request):
         form = UserCreationForm()
     return render(request, 'registro.html', {'form': form})
 
+def vista_protegida(request):
+     if not request.user.is_authenticated:
+         # Redirecciona a login si el usuario no está autenticado r
+         return redirect('login') 
+         return render(request, 'vista_protegida.html')
 
+
+def logout_view(request): 
+    # Cierra la sesión del usuario y limpia la data de SESSION 
+    logout(request) # Redirige a la página de inicio de sesión 
+    return redirect('login') 
+    
 @login_required
 def pagina_inicio(request):
     return render(request, 'biblioteca/inicio.html')
 
 class LibroFilter(django_filters.FilterSet): 
-    id_categoria = django_filters.ModelChoiceFilter(queryset=Categoria.objects.all(), label='Categoría')
+    categoria = django_filters.ModelChoiceFilter(queryset=Categoria.objects.all(), label='Categoría')
     id_autor = django_filters.ModelChoiceFilter(queryset=Autor.objects.all(),
                                                  label='Autor') 
     class Meta: 
         model = Libro
-        fields = ['id_categoria','id_autor'] 
+        fields = ['categoria','id_autor'] 
 
 
 class NacionalidadViewSet(viewsets.ModelViewSet):
@@ -57,7 +70,7 @@ class NacionalidadViewSet(viewsets.ModelViewSet):
     queryset = Nacionalidad.objects.all()
     serializer_class = NacionalidadSerializer
 
-
+@login_required
 def listado_autores(request):
     autores = Autor.objects.all()
     return render(request, 'biblioteca/lista_autores.html', {'autores': autores})
@@ -70,6 +83,7 @@ class AutorViewSet(viewsets.ModelViewSet):
     serializer_class = AutorSerializer
 
 
+@login_required
 def listado_comunas(request):
     comunas = Comuna.objects.all()
     return render(request, 'biblioteca/lista_comunas.html', {'comunas': comunas})
@@ -95,7 +109,7 @@ class BibliotecaViewSet(viewsets.ModelViewSet):
     queryset = Biblioteca.objects.all()
     serializer_class = BibliotecaSerializer
 
-
+@login_required
 def listado_lectores(request):
     return render(request, 'biblioteca/lista_lectores.html')
 
@@ -120,12 +134,10 @@ class CategoriaViewSet(viewsets.ModelViewSet):
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
 
-
-def listado_libros(request):
+@login_required
+def listado_libros(request):  
     f = LibroFilter(request.GET, queryset=Libro.objects.all())
-    return  render(request, 'biblioteca/lista_libros.html',
-                    {'filter': f})
-
+    return render(request, 'biblioteca/lista_libros.html', {'filter': f}) 
 
 
 class LibroViewSet(viewsets.ModelViewSet):

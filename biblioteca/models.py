@@ -7,6 +7,10 @@ ahora = datetime.datetime.now
 # Create your models here.
 
 
+def validar_datos(datos):
+     if datos != 'mis_reglas_de_validacion':
+         raise ValidationError('NO Corresponde.')
+
 def validar_rut(rut):
     if not rut:
         raise ValidationError('RUT inválido.')
@@ -43,11 +47,22 @@ def validar_mayoria_edad(fecha_nacimiento):
         raise ValidationError('El lector debe ser mayor de edad.')
 
 
+
+class MiClase(models.Model):
+     dato1 = models.CharField(max_length=10,
+      blank=False, validators=[validar_datos]) 
+
+
 class Nacionalidad(models.Model):
     pais = models.CharField(max_length=50, blank=False)
     nacionalidad = models.CharField(max_length=50, blank=False)
     created_at = models.DateTimeField(default=ahora)
     updated_at = models.DateTimeField(auto_now=True)
+
+class OpcionesDeGenero(models.TextChoices):
+    MASCULINO = 'M',
+    FEMENINO = 'F',
+ 
 
 
 class Autor(models.Model):
@@ -56,6 +71,7 @@ class Autor(models.Model):
     nombre = models.CharField(max_length=250, blank=False)
     pseudonimo = models.CharField(max_length=50, blank=True)
     biografia = models.TextField(blank=True)
+    genero = models.CharField(max_length=1, choices=OpcionesDeGenero.choices, default=OpcionesDeGenero.MASCULINO)
     created_at = models.DateTimeField(default=ahora)
     updated_at = models.DateTimeField(auto_now=True)
 

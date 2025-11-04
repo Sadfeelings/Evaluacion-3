@@ -39,12 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'biblioteca',
+    'biblioteca.apps.BibliotecaConfig',
     'rest_framework',
     'iconic',
     'drf_yasg',
     'localflavor',
-    'django_filters',  # Asegúrate que esté exactamente así
+    'django_filters',  # Cambiar a esta forma más simple
     'widget_tweaks',
 ]
 
@@ -78,12 +78,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'drf.wsgi.application'
 
 REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
+        'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend'
-    ]
 }
 
 
@@ -150,3 +150,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'login'
+
+
+SESSION_COOKIE_AGE = 3600 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db' 
